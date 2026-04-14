@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Curated Sanctuary | Luxury Hotel</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#d4af37",
+                        "surface-container-low": "#f7f3ee",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#b5c8df",
+                        "on-tertiary-fixed-variant": "#27438a",
+                        "outline": "#7f7663",
+                        "primary": "#735c00",
+                        "tertiary-fixed": "#dbe1ff",
+                        "secondary-container": "#cfe2f9",
+                        "primary-fixed": "#ffe088",
+                        "tertiary": "#415ba4",
+                        "on-tertiary-fixed": "#00174b",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#e6e2dd",
+                        "primary-fixed-dim": "#e9c349",
+                        "inverse-surface": "#31302d",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#241a00",
+                        "tertiary-fixed-dim": "#b4c5ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#e6e2dd",
+                        "surface-tint": "#735c00",
+                        "outline-variant": "#d0c5af",
+                        "tertiary-container": "#97b0ff",
+                        "surface": "#fdf9f4",
+                        "on-surface": "#1c1c19",
+                        "on-secondary-container": "#526478",
+                        "surface-dim": "#ddd9d5",
+                        "surface-container-high": "#ebe8e3",
+                        "on-primary-fixed-variant": "#574500",
+                        "error-container": "#ffdad6",
+                        "secondary": "#4e6073",
+                        "inverse-primary": "#e9c349",
+                        "on-tertiary-container": "#254188",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f4f0eb",
+                        "error": "#ba1a1a",
+                        "background": "#fdf9f4",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#f1ede8",
+                        "on-secondary-fixed-variant": "#36485b",
+                        "on-primary-container": "#554300",
+                        "on-surface-variant": "#4d4635",
+                        "on-background": "#1c1c19",
+                        "secondary-fixed": "#d1e4fb",
+                        "surface-bright": "#fdf9f4",
+                        "on-secondary-fixed": "#091d2e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Noto Serif"],
+                        "body": ["Inter"],
+                        "label": ["Inter"],
+                        "notoSerif": ["Noto Serif"]
+                    }
+                },
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md shadow-[0_20px_40px_rgba(77,70,53,0.06)]">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-full">
+<div class="text-2xl font-notoSerif italic text-amber-800">The Curated Sanctuary</div>
+<div class="hidden md:flex items-center space-x-8 font-notoSerif tracking-wide text-sm uppercase">
+<a class="text-amber-700 border-b-2 border-amber-700/30 pb-1 hover:text-amber-600 transition-colors duration-300" href="#">Rooms</a>
+<a class="text-slate-600 font-medium hover:text-amber-600 transition-colors duration-300" href="#">Offers</a>
+<a class="text-slate-600 font-medium hover:text-amber-600 transition-colors duration-300" href="#">Services</a>
+<a class="text-slate-600 font-medium hover:text-amber-600 transition-colors duration-300" href="#">About Us</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="material-symbols-outlined text-on-surface hover:text-amber-600 transition-colors duration-300">person</button>
+<button class="bg-primary-container text-on-primary-container px-6 py-2 rounded-lg font-notoSerif uppercase tracking-wider text-sm hover:brightness-110 transition-all scale-95 transition-transform duration-200">Book Now</button>
+</div>
+</div>
+</nav>
+<!-- Hero Section -->
+<header class="relative h-screen w-full flex items-center justify-center overflow-hidden">
+<img alt="Luxury resort exterior" class="absolute inset-0 w-full h-full object-cover" data-alt="wide angle shot of a luxury beachfront resort with infinity pool at dusk, golden lighting illuminating the warm stone architecture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRq3ATpUPY8TFVh4cCLE6cyKRqbpxDL8a1F74D41VSWnuGPF862SyASpjxyEa1-WZVM7YPOELoJgBYEEFVKHkuiQnrobasoxG3gYg4mWvwaSsyn5tn6vY-uLVO680eWcs70VyoAOAZn05Z0Wug8K2x2K9xV6ROuSeXaL_iaAdDew4pk5GJzdI7AX2g_lF_jVWNhpiRrTB2BlBKR6z0p94xbCMkQzHykFYv8NToXNUKEIgRYLOnDZ8P34tbT55_KUa3PIfStDq5R18"/>
+<div class="absolute inset-0 bg-black/30"></div>
+<div class="relative z-10 text-center text-white px-4 max-w-4xl">
+<h1 class="font-notoSerif text-5xl md:text-7xl mb-6 leading-tight drop-shadow-lg">Trải Nghiệm Sự Sang Trọng Đích Thực</h1>
+<p class="text-lg md:text-xl font-light mb-10 opacity-90 tracking-wide">Nghỉ dưỡng 5 sao tại trung tâm thành phố với dịch vụ đẳng cấp quốc tế.</p>
+<button class="bg-primary-container text-on-primary-container px-10 py-4 rounded-xl text-lg font-medium hover:scale-105 transition-transform duration-300 shadow-xl">Đặt phòng ngay</button>
+</div>
+</header>
+<!-- Quick Search Bar -->
+<div class="relative z-20 max-w-6xl mx-auto px-4 -mt-16">
+<div class="bg-surface-container-lowest/80 backdrop-blur-xl p-8 rounded-2xl shadow-[0_20px_40px_rgba(77,70,53,0.12)] flex flex-wrap md:flex-nowrap gap-6 items-end">
+<div class="flex-1 min-w-[200px]">
+<label class="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold mb-2">Check-in</label>
+<div class="bg-surface-container-high border-b border-surface-container-highest p-3 rounded-t-lg flex items-center">
+<span class="material-symbols-outlined text-primary mr-2">calendar_today</span>
+<input class="bg-transparent border-none focus:ring-0 w-full text-sm" placeholder="Chọn ngày" type="text"/>
+</div>
+</div>
+<div class="flex-1 min-w-[200px]">
+<label class="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold mb-2">Check-out</label>
+<div class="bg-surface-container-high border-b border-surface-container-highest p-3 rounded-t-lg flex items-center">
+<span class="material-symbols-outlined text-primary mr-2">event_busy</span>
+<input class="bg-transparent border-none focus:ring-0 w-full text-sm" placeholder="Chọn ngày" type="text"/>
+</div>
+</div>
+<div class="flex-1 min-w-[150px]">
+<label class="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold mb-2">Guests</label>
+<div class="bg-surface-container-high border-b border-surface-container-highest p-3 rounded-t-lg flex items-center">
+<span class="material-symbols-outlined text-primary mr-2">group</span>
+<select class="bg-transparent border-none focus:ring-0 w-full text-sm appearance-none">
+<option>2 Người lớn</option>
+<option>1 Người lớn</option>
+<option>Gia đình</option>
+</select>
+</div>
+</div>
+<div class="flex-1 min-w-[150px]">
+<label class="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold mb-2">Room Type</label>
+<div class="bg-surface-container-high border-b border-surface-container-highest p-3 rounded-t-lg flex items-center">
+<span class="material-symbols-outlined text-primary mr-2">bed</span>
+<select class="bg-transparent border-none focus:ring-0 w-full text-sm appearance-none">
+<option>Deluxe Room</option>
+<option>Suite Luxury</option>
+<option>Penthouse</option>
+</select>
+</div>
+</div>
+<button class="bg-primary hover:bg-amber-900 text-white px-8 py-3 rounded-xl font-semibold flex items-center gap-2 transition-colors duration-300">
+<span class="material-symbols-outlined">search</span>
+                Tìm kiếm
+            </button>
+</div>
+</div>
+<!-- Intro Section -->
+<section class="py-24 px-8 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+<div class="relative">
+<div class="aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl">
+<img alt="Hotel interior" class="w-full h-full object-cover" data-alt="Elegant hotel lounge with high ceilings, velvet armchairs, and warm ambient lighting from crystal chandeliers" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAA8IUOX0xJUc6DR9qJ0t3KkAPutb-C5cNLcGljqgk7tM85_d352_n2dk-HuWhvE97Md1agGyaPJ8C7y86QKuADBbRJTTYx6yTdg4RVmHHhU_fusPeociDwQSArNdTF6dOvBunYUrQYW1LXUL-xP7HFJsI7oxibwLmDybrtcb_Iv-ZhpGSB5DIH4avJKi9LnWUWeEUhlQem3A9za1kVCOvXrANVgYU28nzvkXZS7tjvbGo_NciJGIdZW0KHi2NAfaHLvP9zo7h6LCM"/>
+</div>
+<div class="absolute -bottom-8 -right-8 w-1/2 aspect-square rounded-2xl overflow-hidden border-[12px] border-surface shadow-2xl hidden md:block">
+<img alt="Pool view" class="w-full h-full object-cover" data-alt="Sunlight sparkling on the clear blue water of a luxury infinity pool overlooking a tropical garden at sunrise" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYEvzj-5sEeY6vQhcJEDnA1DV5nR6KKDQAKaGp7PCCfR3p5R3P9kSzUuYzMssI9Phzz4hFM7O5WZ-Q9ZuYUVV98kYdBxMpvXjirK5bcIWiQHE0a0N3uYPqk0Ceme2BNjgxAx3y9aBNs86MpUa-mJ7ToM3l3KBKB9Wm343OQ7VzzuYVLJCG1OsqHQiixTlCDYS5ObnoUQ76MwPL-6e25JiqxLjaChMGuIx0B5-3lExZxSqG9ZEM6GjfNgLCqu4oG25rvNQe2mTx_qo"/>
+</div>
+</div>
+<div class="space-y-8">
+<span class="text-primary font-notoSerif italic text-xl">Về chúng tôi</span>
+<h2 class="text-4xl md:text-5xl font-notoSerif text-on-surface leading-tight">Nơi Di Sản Gặp Gỡ Sự Hiện Đại</h2>
+<p class="text-on-surface-variant leading-relaxed text-lg">
+                The Curated Sanctuary không chỉ là một khách sạn; đó là một hành trình khám phá sự tinh tế. Với hơn 50 năm kinh nghiệm trong ngành dịch vụ cao cấp, chúng tôi kiến tạo những không gian nơi mọi chi tiết đều được chăm chút tỉ mỉ, từ hương thơm thảo mộc tại sảnh đợi đến chất liệu lụa tơ tằm của từng chiếc gối.
+            </p>
+<p class="text-on-surface-variant leading-relaxed text-lg">
+                Mỗi vị khách đến với chúng tôi đều được chào đón như một thành viên trong gia đình hoàng gia, với dịch vụ quản gia cá nhân sẵn sàng phục vụ 24/7.
+            </p>
+<button class="border-b-2 border-primary text-primary font-semibold py-2 hover:text-amber-900 transition-colors duration-300">Khám phá câu chuyện của chúng tôi</button>
+</div>
+</section>
+<!-- Featured Rooms -->
+<section class="py-24 bg-surface-container-low">
+<div class="max-w-7xl mx-auto px-8">
+<div class="text-center mb-16 space-y-4">
+<h2 class="text-4xl font-notoSerif">Phòng Nghỉ Sang Trọng</h2>
+<div class="w-24 h-1 bg-primary-container mx-auto"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Room Card 1 -->
+<div class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 flex flex-col">
+<div class="h-64 overflow-hidden">
+<img alt="Superior Room" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" data-alt="Minimalist modern hotel bedroom with king size bed, neutral tones, and large window with city view" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFY6YSLZ8NwnB2BSDF4G14_zu4kNy9PEP4jcbKViYK1TZnEKkWYkMfHK8ykckm-u79-LD83nrKPteuDoXOWJ2D11xXgDHRRvB64UUMuXJgRsBw1t8XM-Isgkany_kUBg0yM5IZ3hZvAscBB1h1vLmjLiEpTvEA_sDn5O2sPsF2HhhaNGdvYJ0gA6lFvD5QbCfh-xmH4rf6fz3HYIbIRwrDStzO0eMXgnz6VQhDgOk-GkyXUhZ2G3SjeuIXPyA_HM3NhQl7iIwOMow"/>
+</div>
+<div class="p-8 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-xl font-notoSerif font-bold">Deluxe City View</h3>
+<span class="text-primary font-bold">2.500k<span class="text-xs font-normal text-on-surface-variant">/đêm</span></span>
+</div>
+<div class="flex gap-4 mb-6 text-sm text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">square_foot</span> 45m²</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">group</span> 2 Khách</span>
+</div>
+<button class="mt-auto w-full border border-outline-variant py-3 rounded-lg hover:bg-primary-container hover:border-primary-container hover:text-on-primary-container transition-all">Chi tiết</button>
+</div>
+</div>
+<!-- Room Card 2 -->
+<div class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 flex flex-col scale-105 z-10">
+<div class="h-64 overflow-hidden relative">
+<span class="absolute top-4 right-4 bg-primary-container text-on-primary-container text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest">Phổ biến</span>
+<img alt="Luxury Suite" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" data-alt="Spacious luxury hotel suite with separate living area, marble floors, and panoramic floor-to-ceiling windows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQc_d43kugF6E6bYNPpsAQX2aU4eZf1WHxmnn19ir1OUuOeRvGUN_RllDeXY2i-bx7SZPkUt8_iVGWOCwCP6YR6pWBXDINJEa92d6mt75GpW4irNxB9m7bf8jIBsNe0acM_nnZ2fD3MnA93C8RukpfeQ1faBKtlgWc8kKTblVi4Ncaoupuz5aPMsjYj3Mh036O_Z66fI26OKxse3l7VtDMfq0_8tiH-KUnzorT70ZTYn_yd6YLdRDJOqZ_oKMqHuWzz8_LdbmS4jA"/>
+</div>
+<div class="p-8 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-xl font-notoSerif font-bold">Executive Suite</h3>
+<span class="text-primary font-bold">4.800k<span class="text-xs font-normal text-on-surface-variant">/đêm</span></span>
+</div>
+<div class="flex gap-4 mb-6 text-sm text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">square_foot</span> 85m²</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">group</span> 3 Khách</span>
+</div>
+<button class="mt-auto w-full bg-primary-container text-on-primary-container py-3 rounded-lg font-semibold hover:brightness-110 transition-all">Chi tiết</button>
+</div>
+</div>
+<!-- Room Card 3 -->
+<div class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 flex flex-col">
+<div class="h-64 overflow-hidden">
+<img alt="Grand Penthouse" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" data-alt="Ultramodern penthouse bedroom with wrap-around balcony, plush dark wood finishes, and mood lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuLFmFTcmp2umJm1BoqKJV7moHYoA67CdbOCjqQzDJ6_ePgvI2JDLXiZDAg0phK9vgouZ_hQFPEb0l7QeEkc4WYwfowbOhBMgyjI-7YPenu5XhJWnXXZFqfvpGEFZsdBdrHOU7RsY0KoWpRcqb-7SkbLOZAi_QGe0BRlsOIVuYtrxSPISJ4P4CdeRuxZyRYtKyoZ5wTRjcNKBZTQzRhT1k1MG7LLS5u1kDhDV27M6w16rU2y2-v5K23ny1QMGa1adjKjSq7rl6vS0"/>
+</div>
+<div class="p-8 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-xl font-notoSerif font-bold">Presidential Villa</h3>
+<span class="text-primary font-bold">12.000k<span class="text-xs font-normal text-on-surface-variant">/đêm</span></span>
+</div>
+<div class="flex gap-4 mb-6 text-sm text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">square_foot</span> 220m²</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">group</span> 4 Khách</span>
+</div>
+<button class="mt-auto w-full border border-outline-variant py-3 rounded-lg hover:bg-primary-container hover:border-primary-container hover:text-on-primary-container transition-all">Chi tiết</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Featured Combos -->
+<section class="py-24 px-8 max-w-7xl mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+<div class="space-y-4">
+<span class="text-primary font-semibold tracking-widest uppercase text-sm">Ưu đãi độc quyền</span>
+<h2 class="text-4xl font-notoSerif">Gói Combo Nghỉ Dưỡng</h2>
+</div>
+<button class="text-primary font-bold flex items-center gap-2 hover:translate-x-2 transition-transform duration-300">
+                Tất cả ưu đãi <span class="material-symbols-outlined">arrow_right_alt</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Combo 1 -->
+<div class="relative group rounded-3xl overflow-hidden h-[400px]">
+<img alt="Honeymoon package" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Romantic dining setup on a private balcony with flower petals, candles, and a view of the sea at dusk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvwGS8vCRsmTyu4MGcCJbKh1U3Kw95mKkNql3L6BFF112fz1tfR_krps1K8Ge33gVbeOGQMA_9g38bsJVfyD_i4lYT94QU8ZmK0AdT4-byi_GmBtvUeBRN_IhigYMG61-7Kxdgnt3mDcj6_ChJ51sPdnaGwnJgtOrRHQcZfK2E_LnqOXQyh9JW7B9s_CcTKqTua1l-etg4AdwNdhtyDC0uP3EM8T7MxAhqTjWv6OZ__jB__KLkR1HqKuQX1ZoponAa5s2UalidfF4"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-10 text-white w-full">
+<div class="flex justify-between items-end">
+<div>
+<span class="bg-primary-container text-on-primary-container text-xs font-bold px-3 py-1 rounded-full mb-4 inline-block">Giảm 25%</span>
+<h3 class="text-3xl font-notoSerif mb-2">Trăng Mật Ngọt Ngào</h3>
+<p class="opacity-80 text-sm mb-6 max-w-sm">Bao gồm bữa tối lãng mạn dưới ánh nến và liệu trình Spa 90 phút cho cặp đôi.</p>
+</div>
+<button class="bg-white/10 backdrop-blur-md border border-white/30 text-white px-6 py-3 rounded-xl hover:bg-white hover:text-on-surface transition-all">Xem ưu đãi</button>
+</div>
+</div>
+</div>
+<!-- Combo 2 -->
+<div class="relative group rounded-3xl overflow-hidden h-[400px]">
+<img alt="Family package" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Happy family playing together in a large resort pool with colorful floats and tropical palms in background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeKYVHlAsuqQ0819V5ezr5hmYXti8kCHsIP5FnJ3TiN1NX1pm6R4zOCijLiqYjg9YvLhrdq6Y_Vi0vDitzwx-Jzt5XHPPqs100PTqcatCssooMepbCZzDw_UfqqlW0FTSWZqtcxC-0Xpm2Czfubnin7TwYtav2AUrlgGgfbpcn7qI1W0gyzo155aqzF8UN2-r_-PRck9Er5Yg07W5v9mav-zw7KAXaLDpS0pYfcymMOQMNQX1LWYj37YJ6MoimKKj67kb0j7H2CUk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-10 text-white w-full">
+<div class="flex justify-between items-end">
+<div>
+<span class="bg-primary-container text-on-primary-container text-xs font-bold px-3 py-1 rounded-full mb-4 inline-block">Giảm 15%</span>
+<h3 class="text-3xl font-notoSerif mb-2">Kỳ Nghỉ Gia Đình</h3>
+<p class="opacity-80 text-sm mb-6 max-w-sm">Miễn phí bữa sáng cho cả gia đình và các hoạt động vui chơi tại Kids Club.</p>
+</div>
+<button class="bg-white/10 backdrop-blur-md border border-white/30 text-white px-6 py-3 rounded-xl hover:bg-white hover:text-on-surface transition-all">Xem ưu đãi</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Amenities Section -->
+<section class="py-24 bg-surface">
+<div class="max-w-7xl mx-auto px-8">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+<div class="flex flex-col items-center text-center space-y-4 p-8 rounded-2xl hover:bg-surface-container-low transition-colors duration-300">
+<div class="w-16 h-16 rounded-full bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-4xl" data-weight="fill">pool</span>
+</div>
+<h4 class="text-xl font-notoSerif">Hồ Bơi Vô Cực</h4>
+<p class="text-sm text-on-surface-variant">Tận hưởng làn nước mát lành với tầm nhìn panorama toàn thành phố.</p>
+</div>
+<div class="flex flex-col items-center text-center space-y-4 p-8 rounded-2xl hover:bg-surface-container-low transition-colors duration-300">
+<div class="w-16 h-16 rounded-full bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-4xl" data-weight="fill">restaurant</span>
+</div>
+<h4 class="text-xl font-notoSerif">Ẩm Thực Buffet</h4>
+<p class="text-sm text-on-surface-variant">Tinh hoa ẩm thực Á - Âu được chế biến bởi các đầu bếp hàng đầu.</p>
+</div>
+<div class="flex flex-col items-center text-center space-y-4 p-8 rounded-2xl hover:bg-surface-container-low transition-colors duration-300">
+<div class="w-16 h-16 rounded-full bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-4xl" data-weight="fill">spa</span>
+</div>
+<h4 class="text-xl font-notoSerif">Dịch Vụ Spa</h4>
+<p class="text-sm text-on-surface-variant">Thư giãn tâm hồn với các liệu trình trị liệu truyền thống độc đáo.</p>
+</div>
+<div class="flex flex-col items-center text-center space-y-4 p-8 rounded-2xl hover:bg-surface-container-low transition-colors duration-300">
+<div class="w-16 h-16 rounded-full bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-4xl" data-weight="fill">fitness_center</span>
+</div>
+<h4 class="text-xl font-notoSerif">Trung Tâm Gym</h4>
+<p class="text-sm text-on-surface-variant">Trang thiết bị hiện đại giúp bạn duy trì vóc dáng ngay cả khi nghỉ dưỡng.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Testimonials Section -->
+<section class="py-24 bg-surface-container-low overflow-hidden">
+<div class="max-w-4xl mx-auto px-8 text-center relative">
+<span class="material-symbols-outlined text-6xl text-primary/20 mb-8">format_quote</span>
+<div class="relative">
+<p class="text-2xl md:text-3xl font-notoSerif italic leading-relaxed text-on-surface mb-12">
+                    "Một trải nghiệm tuyệt vời chưa từng có. Từ lúc bước vào sảnh cho đến lúc check-out, mọi thứ đều hoàn hảo. Đội ngũ nhân viên cực kỳ chuyên nghiệp và thân thiện."
+                </p>
+<div class="flex flex-col items-center">
+<div class="w-20 h-20 rounded-full overflow-hidden mb-4 border-2 border-primary-container p-1">
+<img alt="Guest photo" class="w-full h-full object-cover rounded-full" data-alt="Portrait of a smiling professional woman in her 30s, natural lighting, outdoors background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3K9BCg5XGBNV_GF8XX5ZnnF1gr1febC7UO4sjpodrF6JyY2MOPpXCr7JQlaBnMc9JGVkYM1Zbr4aWKIr-iQTOr-Ww_G9-O-pU7S8fFFQ6CCiBqwEJJgLNmBL-Tz7L0AVV8_jNajHJP4I5wlB25BIiakSzvXt-MiuS5SP9Lh2SZ2AFH_mb3-weLY0HKTqdNvZ2PnYbaKFUEL4WlTHwgNpju70TMrQwjI0eu4ZXo-EHDvzcnXca9tteSHGmfULi0iB9nywhVb5NmtI"/>
+</div>
+<h5 class="font-bold text-lg">Nguyễn Thị Mai Anh</h5>
+<p class="text-sm text-on-surface-variant">Doanh nhân - Hà Nội</p>
+</div>
+</div>
+<!-- Slider dots -->
+<div class="flex justify-center gap-3 mt-12">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-slate-50 dark:bg-slate-950 w-full border-t border-slate-100 dark:border-slate-800">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8 px-12 py-16 w-full">
+<div class="space-y-6">
+<div class="text-xl font-notoSerif text-slate-800 dark:text-slate-200">The Curated Sanctuary</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+                    Đỉnh cao của sự sang trọng và dịch vụ tận tâm. Khám phá không gian nghỉ dưỡng hoàn mỹ ngay giữa lòng thành phố.
+                </p>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-amber-700 cursor-pointer hover:opacity-70">social_leaderboard</span>
+<span class="material-symbols-outlined text-amber-700 cursor-pointer hover:opacity-70">camera_alt</span>
+<span class="material-symbols-outlined text-amber-700 cursor-pointer hover:opacity-70">mail</span>
+</div>
+</div>
+<div class="space-y-6">
+<h6 class="font-bold text-slate-800 dark:text-slate-200">Khám Phá</h6>
+<ul class="space-y-4 font-notoSerif text-sm">
+<li><a class="text-slate-500 hover:text-amber-700 transition-colors" href="#">Hệ thống phòng</a></li>
+<li><a class="text-slate-500 hover:text-amber-700 transition-colors" href="#">Nhà hàng &amp; Bar</a></li>
+<li><a class="text-slate-500 hover:text-amber-700 transition-colors" href="#">Dịch vụ Spa</a></li>
+<li><a class="text-slate-500 hover:text-amber-700 transition-colors" href="#">Sự kiện &amp; Tiệc cưới</a></li>
+</ul>
+</div>
+<div class="space-y-6">
+<h6 class="font-bold text-slate-800 dark:text-slate-200">Thông Tin</h6>
+<ul class="space-y-4 font-notoSerif text-sm">
+<li><a class="text-slate-500 hover:text-amber-700 transition-colors" href="#">Về chúng tôi</a></li>
+<li><a class="text-slate-500 hover:text-amber-700 transition-colors" href="#">Liên hệ</a></li>
+<li><a class="text-slate-500 hover:text-amber-700 transition-colors" href="#">Chính sách bảo mật</a></li>
+<li><a class="text-slate-500 hover:text-amber-700 transition-colors" href="#">Điều khoản dịch vụ</a></li>
+</ul>
+</div>
+<div class="space-y-6">
+<h6 class="font-bold text-slate-800 dark:text-slate-200">Newsletter</h6>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Đăng ký nhận tin để không bỏ lỡ các ưu đãi mới nhất.</p>
+<div class="flex">
+<input class="bg-white border border-slate-200 rounded-l-lg px-4 py-2 w-full focus:outline-none focus:ring-1 focus:ring-amber-700" placeholder="Email của bạn" type="email"/>
+<button class="bg-amber-700 text-white px-4 py-2 rounded-r-lg hover:bg-amber-800 transition-colors">Gửi</button>
+</div>
+</div>
+</div>
+<div class="px-12 py-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center text-slate-400 text-sm">
+<p>© 2024 The Curated Sanctuary. All rights reserved.</p>
+<div class="flex gap-6 mt-4 md:mt-0">
+<a class="hover:text-amber-700" href="#">Privacy Policy</a>
+<a class="hover:text-amber-700" href="#">Terms of Service</a>
+<a class="hover:text-amber-700" href="#">Sitemap</a>
+</div>
+</div>
+</footer>
+</body></html>
