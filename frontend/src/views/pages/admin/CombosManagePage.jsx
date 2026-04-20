@@ -1,9 +1,37 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import PageHeader from '../../components/common/PageHeader';
-import { mockCombos, mockAllServices, formatVND } from '../../../data/mockData';
+import { formatVND } from '../../../utils/formatters';
+import comboService from '../../../services/comboService';
+import adminService from '../../../services/adminService';
+import { SkeletonCard } from '../../components/common/LoadingSkeleton';
 
 export default function CombosManagePage() {
+  const [combos, setCombos] = useState([]);
+  const [allServices, setAllServices] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCombo, setSelectedCombo] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    Promise.all([
+      comboService.getAllCombos(),
+      adminService.getServices()
+    ]).then(([combosRes, servicesRes]) => {
+      if (isMounted) {
+        setCombos(combosRes);
+        setAllServices(servicesRes);
+      }
+    }).catch(err => {
+      console.error("Failed to fetch combos and services", err);
+    }).finally(() => {
+      if (isMounted) setLoading(false);
+    });
+    return () => { isMounted = false; };
+  }, []);
+
+  if (loading) {
+     return <div className="space-y-6 animate-fade-in"><PageHeader title="Quản lý Gói Combo" description="Tạo và quản lý các gói combo ưu đãi" icon="card_giftcard" /><div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"><SkeletonCard /><SkeletonCard /><SkeletonCard /></div></div>;
+  }
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -16,32 +44,32 @@ export default function CombosManagePage() {
       />
 
       {selectedCombo ? (
-        <ComboEditor combo={selectedCombo} onBack={() => setSelectedCombo(null)} />
+        <ComboEditor combo={selectedCombo} allServices={allServices} onBack={() => setSelectedCombo(null)} />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {mockCombos.map(combo => (
-            <div key={combo.MaGoi} className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(77,70,53,0.06)] hover:shadow-[0_8px_32px_rgba(77,70,53,0.1)] transition-all duration-300 group">
-              <div className="h-44 overflow-hidden relative">
-                <img alt={combo.TenGoi} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src={combo.AnhDaiDien} />
+          {combos.map(combo => (
+            <div key={combo.MaGoi} className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(77,70,53,0.06)] hover:shadow-[0_8px_32px_rgba(77,70,53,0.1)] transition-all duration-300 group flex flex-col">
+              <div className="h-44 overflow-hidden relative bg-surface-container-high">
+                <img alt={combo.TenGoi} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src={combo.AnhDaiDien || 'https://via.placeholder.com/400x300'} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 <div className="absolute bottom-3 left-4 flex gap-2">
                   <span className="bg-primary-container text-on-primary-container text-xs font-bold px-2.5 py-0.5 rounded-full">{combo.SoNgay} ngày</span>
                   <span className="bg-emerald-500/20 text-emerald-300 text-xs font-bold px-2.5 py-0.5 rounded-full">-{combo.PhanTramGiam}%</span>
                 </div>
               </div>
-              <div className="p-5">
+              <div className="p-5 flex flex-col flex-1">
                 <h3 className="font-semibold text-on-surface font-notoSerif text-lg mb-1">{combo.TenGoi}</h3>
                 <p className="text-xs text-on-surface-variant mb-3 line-clamp-2">{combo.MoTa}</p>
-                <div className="mb-4">
-                  <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold mb-2">Dịch vụ ({combo.DichVuChiTiet.length})</p>
+                <div className="mb-4 flex-1">
+                  <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold mb-2">Dịch vụ ({combo.dich_vus?.length || 0})</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {combo.DichVuChiTiet.slice(0, 3).map((dv, i) => (
-                      <span key={i} className="text-[10px] bg-surface-container-high px-2 py-0.5 rounded-full text-on-surface-variant">{dv.TenDV} x{dv.SoLuong}</span>
+                    {combo.dich_vus?.slice(0, 3).map((dv, i) => (
+                      <span key={i} className="text-[10px] bg-surface-container-high px-2 py-0.5 rounded-full text-on-surface-variant line-clamp-1 max-w-[120px]">{dv.TenDV} x{dv.pivot?.SoLuong || 1}</span>
                     ))}
-                    {combo.DichVuChiTiet.length > 3 && <span className="text-[10px] text-primary font-semibold">+{combo.DichVuChiTiet.length - 3}</span>}
+                    {(combo.dich_vus?.length || 0) > 3 && <span className="text-[10px] text-primary font-semibold">+{combo.dich_vus.length - 3}</span>}
                   </div>
                 </div>
-                <div className="flex items-center justify-between pt-3 border-t border-surface-container-high">
+                <div className="flex items-center justify-between pt-3 border-t border-surface-container-high filter-none">
                   <div>
                     <span className="text-xs text-on-surface-variant line-through mr-2">{formatVND(combo.GiaGoc)}</span>
                     <span className="text-primary font-bold">{formatVND(combo.GiaCombo)}</span>
@@ -59,9 +87,19 @@ export default function CombosManagePage() {
   );
 }
 
-function ComboEditor({ combo, onBack }) {
-  const [services, setServices] = useState(combo.DichVuChiTiet.map(s => ({ ...s })));
-  const [discount, setDiscount] = useState(combo.PhanTramGiam);
+function ComboEditor({ combo, allServices, onBack }) {
+  // Map combo.dich_vus (backend relation) to our internal editable format
+  const mappedServices = (combo.dich_vus || []).map(s => ({
+    MaDV: s.MaDV,
+    TenDV: s.TenDV,
+    SoLuong: s.pivot?.SoLuong || 1,
+    DonGia: s.DonGia,
+    DonVi: s.DonVi || 'Lần',
+    Icon: s.Icon || 'check_circle'
+  }));
+
+  const [services, setServices] = useState(mappedServices);
+  const [discount, setDiscount] = useState(combo.PhanTramGiam || 0);
   const [showPicker, setShowPicker] = useState(false);
 
   const pricing = useMemo(() => {
@@ -82,11 +120,11 @@ function ComboEditor({ combo, onBack }) {
 
   const addService = (svc) => {
     if (services.find(s => s.MaDV === svc.MaDV)) return;
-    setServices(prev => [...prev, { MaDV: svc.MaDV, TenDV: svc.TenDV, SoLuong: 1, DonGia: svc.DonGia, DonVi: svc.DonVi, Icon: svc.Icon }]);
+    setServices(prev => [...prev, { MaDV: svc.MaDV, TenDV: svc.TenDV, SoLuong: 1, DonGia: svc.DonGia, DonVi: svc.DonVi || 'Lần', Icon: svc.Icon || 'check_circle' }]);
     setShowPicker(false);
   };
 
-  const available = mockAllServices.filter(s => !services.find(sv => sv.MaDV === s.MaDV));
+  const available = allServices.filter(s => !services.find(sv => sv.MaDV === s.MaDV));
 
   return (
     <div className="animate-fade-in">
@@ -109,7 +147,7 @@ function ComboEditor({ combo, onBack }) {
                 {services.map((svc, idx) => (
                   <div key={svc.MaDV} className="flex items-center gap-4 px-6 py-4 hover:bg-surface-container-low/30 transition-colors">
                     <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
-                      <span className="material-symbols-outlined text-primary text-base">{svc.Icon || 'check'}</span>
+                      <span className="material-symbols-outlined text-primary text-base">{svc.Icon}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-on-surface text-sm">{svc.TenDV}</p>
@@ -179,7 +217,7 @@ function ComboEditor({ combo, onBack }) {
               </div>
             </div>
             <button className="w-full bg-primary text-white py-3 rounded-xl font-semibold text-sm hover:bg-amber-900 transition-colors shadow-sm mt-2">
-              Lưu thay đổi
+              Lưu thay đổi (Demo)
             </button>
           </div>
         </div>
@@ -189,23 +227,23 @@ function ComboEditor({ combo, onBack }) {
       {showPicker && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowPicker(false)} />
-          <div className="relative bg-surface-container-lowest rounded-2xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-hidden animate-scale-in">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-surface-container-high">
+          <div className="relative bg-surface-container-lowest rounded-2xl shadow-2xl max-w-lg w-full max-h-[80vh] flex flex-col animate-scale-in">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-surface-container-high flex-shrink-0">
               <h3 className="text-lg font-notoSerif font-bold text-on-surface">Thêm dịch vụ</h3>
               <button onClick={() => setShowPicker(false)} className="p-1 text-on-surface-variant hover:text-on-surface rounded-lg hover:bg-surface-container-high transition-colors">
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
-            <div className="overflow-y-auto max-h-[60vh] p-4 space-y-1">
+            <div className="overflow-y-auto flex-1 p-4 space-y-1">
               {available.length > 0 ? available.map(svc => (
                 <button key={svc.MaDV} onClick={() => addService(svc)}
                   className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-surface-container-low transition-colors text-left">
                   <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
-                    <span className="material-symbols-outlined text-primary text-base">{svc.Icon}</span>
+                    <span className="material-symbols-outlined text-primary text-base">{svc.Icon || 'check_circle'}</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-on-surface text-sm">{svc.TenDV}</p>
-                    <p className="text-xs text-on-surface-variant">{svc.NhomDV}</p>
+                    <p className="text-xs text-on-surface-variant">{svc.NhomDV?.TenNhom || 'Khác'}</p>
                   </div>
                   <p className="text-sm font-semibold text-primary flex-shrink-0">{svc.DonGia > 0 ? formatVND(svc.DonGia) : 'Miễn phí'}</p>
                 </button>

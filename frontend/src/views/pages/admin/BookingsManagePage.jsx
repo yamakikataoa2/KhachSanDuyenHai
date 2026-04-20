@@ -1,13 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PageHeader from '../../components/common/PageHeader';
 import StatusBadge from '../../components/common/StatusBadge';
-import { mockBookings, formatVND, formatDate } from '../../../data/mockData';
+import { formatVND, formatDate } from '../../../utils/formatters';
+import bookingService from '../../../services/bookingService';
+import { SkeletonCard } from '../../components/common/LoadingSkeleton';
 
 export default function BookingsManagePage() {
   const [search, setSearch] = useState('');
-  const filteredBookings = mockBookings.filter(b =>
-    !search || b.MaPhieuDat.toLowerCase().includes(search.toLowerCase()) || b.KhachHang.toLowerCase().includes(search.toLowerCase())
-  );
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    bookingService.getAllBookings()
+      .then(res => {
+        if (isMounted) setBookings(Array.isArray(res) ? res : res.data || []);
+      })
+      .catch(err => console.error("Error fetching bookings:", err))
+      .finally(() => { if (isMounted) setLoading(false); });
+    return () => { isMounted = false; };
+  }, []);
+
+  const filteredBookings = bookings.filter(b => {
+    const customerName = b.khach_hang?.HoTen || b.KhachHang || '';
+    return !search || 
+      (b.MaPhieuDat && b.MaPhieuDat.toString().toLowerCase().includes(search.toLowerCase())) || 
+      customerName.toLowerCase().includes(search.toLowerCase());
+  });
+
+  if (loading) {
+    return <div className="space-y-6 animate-fade-in"><PageHeader title="Quản lý Đặt phòng" description="Xem và xử lý đơn đặt phòng" icon="receipt_long" /><SkeletonCard /><SkeletonCard /></div>;
+  }
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -25,21 +48,23 @@ export default function BookingsManagePage() {
           <table className="w-full">
             <thead>
               <tr className="bg-surface-container-high/50">
-                {['Mã đơn', 'Khách hàng', 'Phòng', 'Check-in', 'Check-out', 'Số khách', 'Tổng tiền', 'Trạng thái', 'Thao tác'].map(h => (
+                {['Mã đơn', 'Khách hàng', 'Phòng', 'Check-in', 'Check-out', 'Tổng tiền', 'Trạng thái', 'Thao tác'].map(h => (
                   <th key={h} className="text-left text-[10px] font-bold uppercase tracking-[0.1em] text-on-surface-variant px-5 py-3">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
+              {filteredBookings.length === 0 && (
+                <tr><td colSpan={8} className="px-5 py-8 text-center text-on-surface-variant text-sm">Không tìm thấy đơn đặt phòng.</td></tr>
+              )}
               {filteredBookings.map((b, i) => (
-                <tr key={b.MaPhieuDat} className={`${i % 2 ? 'bg-surface-container-low/30' : ''} hover:bg-amber-50/40 transition-colors`}>
+                <tr key={b.MaPhieuDat || i} className={`${i % 2 ? 'bg-surface-container-low/30' : ''} hover:bg-amber-50/40 transition-colors`}>
                   <td className="px-5 py-3.5 text-sm font-mono font-semibold text-primary">{b.MaPhieuDat}</td>
-                  <td className="px-5 py-3.5 text-sm text-on-surface">{b.KhachHang}</td>
-                  <td className="px-5 py-3.5 text-sm text-on-surface-variant">{b.LoaiPhong}</td>
-                  <td className="px-5 py-3.5 text-sm text-on-surface-variant">{formatDate(b.NgayNhanPhong)}</td>
-                  <td className="px-5 py-3.5 text-sm text-on-surface-variant">{formatDate(b.NgayTraPhong)}</td>
-                  <td className="px-5 py-3.5 text-sm text-on-surface-variant text-center">{b.SoKhach}</td>
-                  <td className="px-5 py-3.5 text-sm font-semibold text-on-surface">{formatVND(b.TongTien)}</td>
+                  <td className="px-5 py-3.5 text-sm text-on-surface">{b.khach_hang?.HoTen || b.KhachHang}</td>
+                  <td className="px-5 py-3.5 text-sm text-on-surface-variant">{b.chi_tiet_dat_phongs?.[0]?.phong?.loai_phong?.TenLoai || b.LoaiPhong || 'N/A'}</td>
+                  <td className="px-5 py-3.5 text-sm text-on-surface-variant">{formatDate(b.NgayNhanDuKien || b.NgayNhanPhong)}</td>
+                  <td className="px-5 py-3.5 text-sm text-on-surface-variant">{formatDate(b.NgayTraDuKien || b.NgayTraPhong)}</td>
+                  <td className="px-5 py-3.5 text-sm font-semibold text-on-surface">{formatVND(b.TongTien || b.tong_tien || 0)}</td>
                   <td className="px-5 py-3.5"><StatusBadge status={b.TrangThai} /></td>
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-1">

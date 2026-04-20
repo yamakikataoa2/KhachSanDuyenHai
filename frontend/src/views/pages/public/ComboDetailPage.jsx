@@ -1,23 +1,59 @@
-import React, { useState, useMemo } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { mockCombos, mockAllServices, formatVND } from '../../../data/mockData';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { formatVND } from '../../../utils/formatters';
+import comboService from '../../../services/comboService';
+import adminService from '../../../services/adminService';
+import { SkeletonCard } from '../../components/common/LoadingSkeleton';
 
 export default function ComboDetailPage() {
   const { id } = useParams();
-  const combo = mockCombos.find(c => String(c.MaGoi) === id) || mockCombos[0];
-
-  const [services, setServices] = useState(
-    combo.DichVuChiTiet.map(s => ({ ...s }))
-  );
+  const navigate = useNavigate();
+  const [combo, setCombo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [allServices, setAllServices] = useState([]);
+  const [services, setServices] = useState([]);
   const [showPicker, setShowPicker] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [comboData, svcsData] = await Promise.all([
+          comboService.getComboDetail(id),
+          adminService.getServices()
+        ]);
+        if (isMounted) {
+          setCombo(comboData);
+          setAllServices(svcsData);
+          setServices(comboData.DanhSachDichVu.map(s => ({
+            MaDV: s.MaDichVu,
+            TenDV: s.TenDichVu,
+            SoLuong: s.SoLuong,
+            DonGia: s.DonGia,
+            DonVi: s.DonViTinh,
+            NhomDV: s.NhomDV,
+            Icon: s.Icon || 'check_circle'
+          })));
+        }
+      } catch (err) {
+        console.error("Error fetching combo data:", err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    fetchData();
+    return () => { isMounted = false; };
+  }, [id]);
 
   // Real-time pricing calculation
   const pricing = useMemo(() => {
+    if (!combo) return { giaGoc: 0, giamGia: 0, tongThanhToan: 0, phanTram: 0 };
     const giaGoc = services.reduce((sum, s) => sum + s.DonGia * s.SoLuong, 0);
     const giamGia = Math.round(giaGoc * combo.PhanTramGiam / 100);
     const tongThanhToan = giaGoc - giamGia;
     return { giaGoc, giamGia, tongThanhToan, phanTram: combo.PhanTramGiam };
-  }, [services, combo.PhanTramGiam]);
+  }, [services, combo]);
 
   const updateQuantity = (idx, delta) => {
     setServices(prev => prev.map((s, i) => {
@@ -32,16 +68,32 @@ export default function ComboDetailPage() {
   };
 
   const addService = (svc) => {
-    const existing = services.find(s => s.MaDV === svc.MaDV);
+    const existing = services.find(s => s.MaDV === svc.MaDichVu);
     if (existing) {
-      setServices(prev => prev.map(s => s.MaDV === svc.MaDV ? { ...s, SoLuong: s.SoLuong + 1 } : s));
+      setServices(prev => prev.map(s => s.MaDV === svc.MaDichVu ? { ...s, SoLuong: s.SoLuong + 1 } : s));
     } else {
-      setServices(prev => [...prev, { MaDV: svc.MaDV, TenDV: svc.TenDV, SoLuong: 1, DonGia: svc.DonGia, DonVi: svc.DonVi, Icon: svc.Icon }]);
+      setServices(prev => [...prev, { MaDV: svc.MaDichVu, TenDV: svc.TenDichVu, SoLuong: 1, DonGia: svc.DonGia, DonVi: svc.DonViTinh, NhomDV: svc.NhomDV, Icon: svc.Icon || 'check_circle' }]);
     }
     setShowPicker(false);
   };
 
-  const availableToAdd = mockAllServices.filter(s => !services.find(sv => sv.MaDV === s.MaDV));
+  const handleBookingNavigate = () => {
+    navigate('/booking', { state: { selectedCombo: combo, customServices: services, customPricing: pricing } });
+  };
+
+  const availableToAdd = allServices.filter(s => !services.find(sv => sv.MaDV === s.MaDichVu));
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-8 py-24">
+        <SkeletonCard />
+      </div>
+    );
+  }
+
+  if (!combo) {
+    return <div className="text-center py-24">Không tìm thấy combo!</div>;
+  }
 
   return (
     <div className="animate-fade-in">
@@ -141,10 +193,10 @@ export default function ComboDetailPage() {
               <p className="text-xs text-on-surface-variant mt-1">/ {combo.SoNgay} ngày • cho {combo.SoNguoi} người</p>
             </div>
             <div className="space-y-2.5 pt-2">
-              <Link to="/booking" className="flex items-center justify-center gap-2 w-full bg-primary text-white py-3.5 rounded-xl font-semibold hover:bg-amber-900 transition-all shadow-md text-sm">
+              <button onClick={handleBookingNavigate} className="flex items-center justify-center gap-2 w-full bg-primary text-white py-3.5 rounded-xl font-semibold hover:bg-amber-900 transition-all shadow-md text-sm">
                 <span className="material-symbols-outlined text-lg">calendar_month</span>
                 Đặt combo ngay
-              </Link>
+              </button>
               <button className="w-full py-3 border border-outline-variant rounded-xl text-sm font-medium text-on-surface hover:bg-surface-container-high transition-colors">
                 Yêu cầu tùy chỉnh
               </button>

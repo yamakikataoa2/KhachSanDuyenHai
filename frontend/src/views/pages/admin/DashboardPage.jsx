@@ -1,14 +1,56 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageHeader from '../../components/common/PageHeader';
 import StatCard from '../../components/common/StatCard';
 import StatusBadge from '../../components/common/StatusBadge';
-import { mockDashboardStats, mockBookings, formatVND, formatDate } from '../../../data/mockData';
+import { formatVND, formatDate } from '../../../utils/formatters';
+import adminService from '../../../services/adminService';
+import bookingService from '../../../services/bookingService';
+import { SkeletonCard } from '../../components/common/LoadingSkeleton';
 
 export default function DashboardPage() {
-  const stats = mockDashboardStats;
-  const recentBookings = mockBookings.slice(0, 5);
-  const maxRevenue = Math.max(...stats.doanhThuTuan);
+  const [stats, setStats] = useState(null);
+  const [recentBookings, setRecentBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchDashboard = async () => {
+      try {
+        setLoading(true);
+        const [statsRes, bookingsRes] = await Promise.all([
+          adminService.getDashboard(),
+          bookingService.getAllBookings({ limit: 5 })
+        ]);
+        if (isMounted) {
+          setStats(statsRes);
+          setRecentBookings(bookingsRes.slice(0, 5) || []);
+        }
+      } catch (err) {
+        console.error("Dashboard fetch error:", err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    fetchDashboard();
+    return () => { isMounted = false; };
+  }, []);
+
+  if (loading || !stats) {
+    return (
+      <div className="animate-fade-in space-y-8">
+         <PageHeader title="Dashboard" description="Tổng quan hoạt động khách sạn hôm nay" icon="dashboard" />
+         <SkeletonCard />
+      </div>
+    );
+  }
+
+  // Placeholder for revenue chart since backend doesn't provide it yet
+  const dummyTuan = [0, 0, 0, 0, 0, 0, 0];
+  const maxRevenue = 100;
+  const tenNgayTuan = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+  
+  const baoTri = Math.max(0, stats.tongPhong - stats.phongTrong - stats.phongDangSD);
 
   return (
     <div className="animate-fade-in space-y-8">
@@ -21,32 +63,35 @@ export default function DashboardPage() {
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard icon="bed" label="Tổng phòng" value={stats.tongPhong} subtitle={`${stats.tyLeLapDay}% lấp đầy`} trend="+5%" trendUp color="primary" />
-        <StatCard icon="receipt_long" label="Đơn hôm nay" value={stats.donHomNay} subtitle="Đơn đặt phòng mới" trend="+12%" trendUp color="info" />
-        <StatCard icon="payments" label="Doanh thu tháng" value={formatVND(stats.doanhThuThang)} subtitle="Tháng 4, 2026" trend="+8.5%" trendUp color="success" />
-        <StatCard icon="group" label="Khách đang ở" value={stats.khachDangO} subtitle="Hiện đang lưu trú" color="warning" />
+        <StatCard icon="receipt_long" label="Đơn hôm nay" value={stats.bookingsHomNay} subtitle="Đơn đặt phòng mới" trend="+12%" trendUp color="info" />
+        <StatCard icon="payments" label="Doanh thu tháng" value={formatVND(stats.doanhThuThang || 0)} subtitle="Doanh thu hiện tại" trend="+8.5%" trendUp color="success" />
+        <StatCard icon="group" label="Chờ xác nhận" value={stats.bookingsChoDuyet} subtitle="Cần xử lý" color="warning" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Revenue Chart */}
-        <div className="lg:col-span-2 bg-surface-container-lowest p-6 rounded-2xl shadow-[0_2px_12px_rgba(77,70,53,0.06)]">
+        <div className="lg:col-span-2 bg-surface-container-lowest p-6 rounded-2xl shadow-[0_2px_12px_rgba(77,70,53,0.06)] relative overflow-hidden">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="font-semibold text-on-surface">Doanh thu 7 ngày qua</h3>
-              <p className="text-xs text-on-surface-variant mt-1">Đơn vị: triệu VNĐ</p>
+              <p className="text-xs text-on-surface-variant mt-1">Tính năng biểu đồ API đang phát triển</p>
             </div>
             <span className="text-xs text-emerald-600 font-semibold bg-emerald-50 px-3 py-1 rounded-full">+15.2%</span>
           </div>
-          <div className="flex items-end gap-3 h-48">
-            {stats.doanhThuTuan.map((val, i) => (
+          <div className="flex items-end gap-3 h-48 opacity-30">
+            {dummyTuan.map((val, i) => (
               <div key={i} className="flex-1 flex flex-col items-center gap-2">
                 <span className="text-xs font-semibold text-on-surface-variant">{val}tr</span>
                 <div 
                   className="w-full bg-primary-container/60 hover:bg-primary-container rounded-t-lg transition-all duration-300 cursor-pointer min-h-[8px]"
-                  style={{ height: `${(val / maxRevenue) * 100}%` }}
+                  style={{ height: `10%` }}
                 />
-                <span className="text-[10px] text-on-surface-variant font-medium">{stats.tenNgayTuan[i]}</span>
+                <span className="text-[10px] text-on-surface-variant font-medium">{tenNgayTuan[i]}</span>
               </div>
             ))}
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="bg-surface-container/80 backdrop-blur-sm px-4 py-2 rounded-xl text-sm font-medium text-on-surface">Coming Soon</div>
           </div>
         </div>
 
@@ -55,10 +100,9 @@ export default function DashboardPage() {
           <h3 className="font-semibold text-on-surface mb-6">Tình trạng phòng</h3>
           <div className="space-y-4">
             {[
-              { label: 'Đang sử dụng', value: 32, total: 45, color: 'bg-emerald-500' },
-              { label: 'Phòng trống', value: 10, total: 45, color: 'bg-blue-500' },
-              { label: 'Đang dọn dẹp', value: 2, total: 45, color: 'bg-amber-500' },
-              { label: 'Bảo trì', value: 1, total: 45, color: 'bg-red-500' },
+              { label: 'Đang sử dụng', value: stats.phongDangSD, total: stats.tongPhong, color: 'bg-emerald-500' },
+              { label: 'Phòng trống', value: stats.phongTrong, total: stats.tongPhong, color: 'bg-blue-500' },
+              { label: 'Bảo trì / Dọn dẹp', value: baoTri, total: stats.tongPhong, color: 'bg-amber-500' },
             ].map((item, i) => (
               <div key={i}>
                 <div className="flex justify-between text-sm mb-1.5">
@@ -66,7 +110,7 @@ export default function DashboardPage() {
                   <span className="font-semibold text-on-surface">{item.value}</span>
                 </div>
                 <div className="w-full bg-surface-container-high rounded-full h-2">
-                  <div className={`${item.color} h-2 rounded-full transition-all duration-500`} style={{ width: `${(item.value / item.total) * 100}%` }} />
+                  <div className={`${item.color} h-2 rounded-full transition-all duration-500`} style={{ width: `${stats.tongPhong > 0 ? (item.value / item.total) * 100 : 0}%` }} />
                 </div>
               </div>
             ))}
@@ -88,18 +132,19 @@ export default function DashboardPage() {
                 <th className="text-left text-[10px] font-bold uppercase tracking-[0.1em] text-on-surface-variant px-6 py-3">Khách hàng</th>
                 <th className="text-left text-[10px] font-bold uppercase tracking-[0.1em] text-on-surface-variant px-6 py-3">Phòng</th>
                 <th className="text-left text-[10px] font-bold uppercase tracking-[0.1em] text-on-surface-variant px-6 py-3">Check-in</th>
-                <th className="text-left text-[10px] font-bold uppercase tracking-[0.1em] text-on-surface-variant px-6 py-3">Tổng tiền</th>
                 <th className="text-left text-[10px] font-bold uppercase tracking-[0.1em] text-on-surface-variant px-6 py-3">Trạng thái</th>
               </tr>
             </thead>
             <tbody>
+              {recentBookings.length === 0 && (
+                <tr><td colSpan={5} className="px-6 py-4 text-center text-sm text-on-surface-variant">Không có đơn đặt phòng nào.</td></tr>
+              )}
               {recentBookings.map((b, i) => (
-                <tr key={i} className={`${i % 2 === 0 ? 'bg-surface-container-lowest' : 'bg-surface-container-low/30'} hover:bg-amber-50/40 transition-colors`}>
+                <tr key={b.MaPhieuDat || i} className={`${i % 2 === 0 ? 'bg-surface-container-lowest' : 'bg-surface-container-low/30'} hover:bg-amber-50/40 transition-colors`}>
                   <td className="px-6 py-4 text-sm font-mono font-semibold text-primary">{b.MaPhieuDat}</td>
-                  <td className="px-6 py-4 text-sm text-on-surface">{b.KhachHang}</td>
-                  <td className="px-6 py-4 text-sm text-on-surface-variant">{b.LoaiPhong}</td>
-                  <td className="px-6 py-4 text-sm text-on-surface-variant">{formatDate(b.NgayNhanPhong)}</td>
-                  <td className="px-6 py-4 text-sm font-semibold text-on-surface">{formatVND(b.TongTien)}</td>
+                  <td className="px-6 py-4 text-sm text-on-surface">{b.khach_hang?.HoTen || b.KhachHang}</td>
+                  <td className="px-6 py-4 text-sm text-on-surface-variant">{b.chi_tiet_dat_phongs?.[0]?.phong?.loai_phong?.TenLoai || b.LoaiPhong || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-on-surface-variant">{formatDate(b.NgayNhanDuKien)}</td>
                   <td className="px-6 py-4"><StatusBadge status={b.TrangThai} /></td>
                 </tr>
               ))}

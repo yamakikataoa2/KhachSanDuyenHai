@@ -7,20 +7,34 @@ import ComboSection from '../../sections/home/ComboSection';
 import AmenitiesSection from '../../sections/home/AmenitiesSection';
 import CTASection from '../../sections/home/CTASection';
 import TestimonialsSection from '../../sections/home/TestimonialsSection';
-import { mockRooms, mockCombos } from '../../../data/mockData';
-
+import roomService from '../../../services/roomService';
+import comboService from '../../../services/comboService';
 export default function HomePage() {
   const [rooms, setRooms] = useState([]);
   const [combos, setCombos] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setRooms(mockRooms);
-      setCombos(mockCombos);
-      setLoading(false);
-    }, 600);
-    return () => clearTimeout(timer);
+    let isMounted = true;
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [roomTypesRes, combosRes] = await Promise.all([
+          roomService.getRoomTypes(),
+          comboService.getCombos()
+        ]);
+        if (isMounted) {
+          setRooms(roomTypesRes);
+          setCombos(combosRes);
+        }
+      } catch (error) {
+        console.error("Error fetching homepage data:", error);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    fetchData();
+    return () => { isMounted = false; };
   }, []);
 
   return (

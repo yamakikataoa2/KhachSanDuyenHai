@@ -1,19 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PageHeader from '../../components/common/PageHeader';
 import StatusBadge from '../../components/common/StatusBadge';
-import { mockRooms, formatVND } from '../../../data/mockData';
+import { formatVND } from '../../../utils/formatters';
+import roomService from '../../../services/roomService';
+import { SkeletonCard } from '../../components/common/LoadingSkeleton';
 
 export default function RoomsManagePage() {
+  const [roomTypes, setRoomTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    roomService.getRoomTypes()
+      .then(res => { if (isMounted) setRoomTypes(res); })
+      .catch(err => console.error("Error fetching room types:", err))
+      .finally(() => { if (isMounted) setLoading(false); });
+    return () => { isMounted = false; };
+  }, []);
+
+  if (loading) return <div className="space-y-6 animate-fade-in"><PageHeader title="Quản lý Phòng nghỉ" description="Danh sách và quản lý toàn bộ phòng trong khách sạn" icon="bed" /><div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"><SkeletonCard /><SkeletonCard /><SkeletonCard /></div></div>;
+
   return (
     <div className="animate-fade-in space-y-6">
       <PageHeader title="Quản lý Phòng nghỉ" description="Danh sách và quản lý toàn bộ phòng trong khách sạn" icon="bed"
         actions={<button className="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl font-medium hover:bg-amber-900 transition-colors text-sm shadow-sm"><span className="material-symbols-outlined text-lg">add</span>Thêm phòng</button>}
       />
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {mockRooms.map((room) => (
+        {roomTypes.map((room) => (
           <div key={room.MaLoaiPhong} className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(77,70,53,0.06)] hover:shadow-[0_8px_32px_rgba(77,70,53,0.1)] transition-all duration-300 group">
-            <div className="h-48 overflow-hidden relative">
-              <img alt={room.TenLoai} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src={room.AnhDaiDien} />
+            <div className="h-48 overflow-hidden relative bg-surface-container-high">
+              <img alt={room.TenLoai} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src={room.AnhDaiDien || 'https://via.placeholder.com/400x300'} />
               <div className="absolute top-3 right-3">
                 <StatusBadge status="Hoạt động" />
               </div>
@@ -23,7 +39,7 @@ export default function RoomsManagePage() {
                 <h3 className="font-semibold text-on-surface font-notoSerif">{room.TenLoai}</h3>
                 <span className="text-primary font-bold text-sm">{formatVND(room.GiaMacDinh)}<span className="text-xs text-on-surface-variant font-normal">/đêm</span></span>
               </div>
-              <div className="flex gap-4 text-xs text-on-surface-variant mb-4">
+              <div className="flex gap-4 text-xs text-on-surface-variant mb-4 flex-wrap">
                 <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">group</span>{room.SoNguoiToiDa} khách</span>
                 <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">square_foot</span>{room.DienTich}m²</span>
               </div>

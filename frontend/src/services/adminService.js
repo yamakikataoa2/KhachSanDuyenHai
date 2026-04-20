@@ -33,6 +33,9 @@ export const adminService = {
   // User profile (admin of user)
   getProfile: () => apiClient.get('/user/profile'),
   updateProfile: (data) => apiClient.put('/user/profile', data),
+
+  // Invoices (Admin)
+  getInvoices: (params) => apiClient.get('/admin/invoices', { params }),
 };
 
 export default adminService;

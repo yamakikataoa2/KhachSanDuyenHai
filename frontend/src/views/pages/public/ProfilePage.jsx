@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../store/AuthContext';
 import apiClient from '../../../services/apiClient';
-import { formatVND, formatDate, mockUserBookings, mockInvoices } from '../../../data/mockData';
+import { formatVND, formatDate } from '../../../utils/formatters';
 
 export default function ProfilePage() {
   const { user, logout, updateUser, isAuthenticated } = useAuth();
@@ -36,10 +36,8 @@ export default function ProfilePage() {
           CCCD_CMND: profileRes.value.CCCD_CMND || '',
         });
       }
-      if (bookingsRes.status === 'fulfilled') setBookings(bookingsRes.value);
-      else setBookings(mockUserBookings); // fallback to mock
-      if (invoicesRes.status === 'fulfilled') setInvoices(invoicesRes.value);
-      else setInvoices(mockInvoices);
+      if (bookingsRes.status === 'fulfilled') setBookings(bookingsRes.value || []);
+      if (invoicesRes.status === 'fulfilled') setInvoices(invoicesRes.value || []);
     } catch (e) {
       console.error(e);
     }

@@ -1,36 +1,54 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import PageHeader from '../../components/common/PageHeader';
 import StatCard from '../../components/common/StatCard';
 import StatusBadge from '../../components/common/StatusBadge';
 import EmptyState from '../../components/common/EmptyState';
-import { mockInvoices, formatVND, formatDate } from '../../../data/mockData';
+import { formatVND, formatDate } from '../../../utils/formatters';
+import adminService from '../../../services/adminService';
+import { SkeletonCard } from '../../components/common/LoadingSkeleton';
 
 export default function InvoicesManagePage() {
+  const [invoices, setInvoices] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [methodFilter, setMethodFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
 
+  useEffect(() => {
+    let isMounted = true;
+    adminService.getInvoices()
+      .then(res => {
+        if (isMounted) setInvoices(Array.isArray(res) ? res : res.data || []);
+      })
+      .catch(err => console.error("Error fetching invoices:", err))
+      .finally(() => { if (isMounted) setLoading(false); });
+    return () => { isMounted = false; };
+  }, []);
+
   // Stats
-  const totalInvoices = mockInvoices.length;
-  const unpaid = mockInvoices.filter(i => i.TrangThaiThanhToan === 'Chưa thanh toán').length;
-  const paid = mockInvoices.filter(i => i.TrangThaiThanhToan === 'Đã thanh toán').length;
-  const totalRevenue = mockInvoices
+  const totalInvoices = invoices.length;
+  const unpaid = invoices.filter(i => i.TrangThaiThanhToan !== 'Đã thanh toán').length;
+  const paid = invoices.filter(i => i.TrangThaiThanhToan === 'Đã thanh toán').length;
+  const totalRevenue = invoices
     .filter(i => i.TrangThaiThanhToan === 'Đã thanh toán')
-    .reduce((sum, i) => sum + i.TongThanhToan, 0);
+    .reduce((sum, i) => sum + (Number(i.TongThanhToan) || 0), 0);
 
   // Filtered data
   const filteredInvoices = useMemo(() => {
-    return mockInvoices.filter(inv => {
+    return invoices.filter(inv => {
+      const customerName = inv.phieu_dat_phong?.khach_hang?.HoTen || '';
+      const email = inv.phieu_dat_phong?.khach_hang?.Email || '';
       const matchSearch = !search || 
-        inv.MaHoaDon.toLowerCase().includes(search.toLowerCase()) ||
-        inv.KhachHang.toLowerCase().includes(search.toLowerCase());
+        (inv.MaHoaDon && inv.MaHoaDon.toLowerCase().includes(search.toLowerCase())) ||
+        customerName.toLowerCase().includes(search.toLowerCase()) ||
+        email.toLowerCase().includes(search.toLowerCase());
       const matchStatus = !statusFilter || inv.TrangThaiThanhToan === statusFilter;
       const matchMethod = !methodFilter || inv.PhuongThucThanhToan === methodFilter;
-      const matchDate = !dateFilter || inv.NgayLap === dateFilter;
+      const matchDate = !dateFilter || formatDate(inv.NgayLap) === formatDate(dateFilter);
       return matchSearch && matchStatus && matchMethod && matchDate;
     });
-  }, [search, statusFilter, methodFilter, dateFilter]);
+  }, [invoices, search, statusFilter, methodFilter, dateFilter]);
 
   const clearFilters = () => {
     setSearch('');
@@ -38,6 +56,17 @@ export default function InvoicesManagePage() {
     setMethodFilter('');
     setDateFilter('');
   };
+
+  if (loading) {
+    return (
+       <div className="animate-fade-in space-y-6">
+          <PageHeader title="Quản lý Hóa đơn" description="Theo dõi và quản lý toàn bộ hóa đơn thanh toán" icon="payments" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+             <SkeletonCard /><SkeletonCard /><SkeletonCard /><SkeletonCard />
+          </div>
+       </div>
+    );
+  }
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -140,12 +169,12 @@ export default function InvoicesManagePage() {
               </thead>
               <tbody>
                 {filteredInvoices.map((inv, idx) => (
-                  <tr key={inv.MaHoaDon} className={`${idx % 2 === 0 ? '' : 'bg-surface-container-low/30'} hover:bg-amber-50/40 transition-colors`}>
-                    <td className="px-6 py-4 text-sm font-mono font-semibold text-primary">{inv.MaHoaDon}</td>
+                  <tr key={inv.MaHoaDon || idx} className={`${idx % 2 === 0 ? '' : 'bg-surface-container-low/30'} hover:bg-amber-50/40 transition-colors`}>
+                    <td className="px-6 py-4 text-sm font-mono font-semibold text-primary">{inv.MaHoaDon || `HD${inv.MaPhieuDat}`}</td>
                     <td className="px-6 py-4">
                       <div>
-                        <p className="text-sm font-medium text-on-surface">{inv.KhachHang}</p>
-                        <p className="text-xs text-on-surface-variant">{inv.Email}</p>
+                        <p className="text-sm font-medium text-on-surface">{inv.phieu_dat_phong?.khach_hang?.HoTen || 'N/A'}</p>
+                        <p className="text-xs text-on-surface-variant">{inv.phieu_dat_phong?.khach_hang?.Email || 'N/A'}</p>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-on-surface-variant font-mono">{inv.MaPhieuDat}</td>
@@ -193,7 +222,7 @@ export default function InvoicesManagePage() {
         {filteredInvoices.length > 0 && (
           <div className="flex items-center justify-between px-6 py-4 border-t border-surface-container-high/50">
             <p className="text-sm text-on-surface-variant">
-              Hiển thị <span className="font-semibold text-on-surface">{filteredInvoices.length}</span> / {mockInvoices.length} hóa đơn
+              Hiển thị <span className="font-semibold text-on-surface">{filteredInvoices.length}</span> / {invoices.length} hóa đơn
             </p>
             <div className="flex items-center gap-1">
               <button className="px-3 py-1.5 text-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors">Trước</button>

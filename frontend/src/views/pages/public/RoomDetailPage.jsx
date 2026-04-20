@@ -1,10 +1,44 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { mockRooms, formatVND } from '../../../data/mockData';
+import { formatVND } from '../../../utils/formatters';
+import roomService from '../../../services/roomService';
+import { SkeletonCard } from '../../components/common/LoadingSkeleton';
 
 export default function RoomDetailPage() {
   const { id } = useParams();
-  const room = mockRooms.find(r => String(r.MaLoaiPhong) === id) || mockRooms[0];
+  const [room, setRoom] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchRoom = async () => {
+      try {
+        setLoading(true);
+        const data = await roomService.getRoomTypeDetail(id);
+        if (isMounted) setRoom(data);
+      } catch (err) {
+        console.error("Error fetching room details:", err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    fetchRoom();
+    return () => { isMounted = false; };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-8 py-24">
+        <SkeletonCard />
+      </div>
+    );
+  }
+
+  if (!room) {
+    return <div className="text-center py-24">Không ráp thấy phòng!</div>;
+  }
+
+  const tienNghiList = Array.isArray(room.TienNghi) ? room.TienNghi : (room.TienNghi ? (room.TienNghi.startsWith('[') ? JSON.parse(room.TienNghi) : room.TienNghi.split(',').map(s => s.trim())) : []);
 
   return (
     <div className="animate-fade-in">
@@ -31,7 +65,7 @@ export default function RoomDetailPage() {
           <div>
             <h2 className="text-2xl font-notoSerif font-bold text-on-surface mb-4">Tiện nghi</h2>
             <div className="grid grid-cols-2 gap-3">
-              {room.TienNghi.map((tn, i) => (
+              {tienNghiList.map((tn, i) => (
                 <div key={i} className="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl">
                   <span className="material-symbols-outlined text-primary text-lg">check_circle</span>
                   <span className="text-sm text-on-surface">{tn}</span>

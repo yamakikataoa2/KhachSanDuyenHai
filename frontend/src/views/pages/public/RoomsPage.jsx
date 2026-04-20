@@ -1,11 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { mockRooms, formatVND } from '../../../data/mockData';
 import RoomCard from '../../components/room/RoomCard';
+import roomService from '../../../services/roomService';
 
 export default function RoomsPage() {
   const [filter, setFilter] = useState('');
-  const filtered = mockRooms.filter(r => !filter || r.TenLoai.toLowerCase().includes(filter.toLowerCase()));
+  const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchRooms = async () => {
+      try {
+        setLoading(true);
+        const data = await roomService.getRoomTypes();
+        if (isMounted) setRooms(data);
+      } catch (err) {
+        console.error("Error fetching room types:", err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    fetchRooms();
+    return () => { isMounted = false; };
+  }, []);
+
+  const filtered = rooms.filter(r => !filter || r.TenLoai.toLowerCase().includes(filter.toLowerCase()));
 
   return (
     <div className="animate-fade-in">
