@@ -199,4 +199,26 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Unknown user type'], 400);
     }
+
+    /**
+     * PUT /api/user/change-password
+     * Đổi mật khẩu
+     */
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'MatKhauCu'  => 'required|string',
+            'MatKhauMoi' => 'required|string|min:6',
+        ]);
+
+        $user = $request->user();
+
+        if (!Hash::check($request->MatKhauCu, $user->MatKhau)) {
+            return response()->json(['message' => 'Mật khẩu hiện tại không đúng'], 422);
+        }
+
+        $user->update(['MatKhau' => Hash::make($request->MatKhauMoi)]);
+
+        return response()->json(['message' => 'Đổi mật khẩu thành công!']);
+    }
 }

@@ -11,6 +11,7 @@ use App\Models\ChiTietGoiCombo;
 use App\Models\ChiTietDatPhong;
 use App\Models\SuDungDichVu;
 use App\Models\Phong;
+use App\Models\HoaDon;
 
 class BookingController extends Controller
 {
@@ -335,6 +336,26 @@ class BookingController extends Controller
 
         $tongKhach = \App\Models\KhachHang::count();
 
+        // F1: Revenue chart — last 7 days
+        $revenueChart = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $revenue = HoaDon::where('TrangThaiThanhToan', 'Đã thanh toán')
+                ->whereDate('NgayLap', $date->toDateString())
+                ->sum('TongThanhToan');
+            $revenueChart[] = [
+                'date'    => $date->format('d/m'),
+                'weekday' => $date->locale('vi')->isoFormat('ddd'),
+                'revenue' => (float) $revenue,
+            ];
+        }
+
+        // Recent bookings
+        $recentBookings = PhieuDatPhong::with(['khachHang', 'chiTietDatPhongs.phong.loaiPhong'])
+            ->orderBy('NgayDat', 'desc')
+            ->limit(5)
+            ->get();
+
         return response()->json([
             'tongPhong'         => $tongPhong,
             'phongTrong'        => $phongTrong,
@@ -344,6 +365,8 @@ class BookingController extends Controller
             'doanhThuThang'     => $doanhThuThang,
             'tongKhach'         => $tongKhach,
             'tyLeLapDay'        => $tongPhong > 0 ? round($phongDangSD / $tongPhong * 100) : 0,
+            'revenueChart'      => $revenueChart,
+            'recentBookings'    => $recentBookings,
         ]);
     }
 }

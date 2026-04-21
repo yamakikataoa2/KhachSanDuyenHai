@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../store/AuthContext';
 import apiClient from '../../../services/apiClient';
+import authService from '../../../services/authService';
 import { formatVND, formatDate } from '../../../utils/formatters';
 
 export default function ProfilePage() {
@@ -13,6 +14,8 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [form, setForm] = useState({ HoTen: '', SoDienThoai: '', DiaChi: '', CCCD_CMND: '' });
+  const [pwForm, setPwForm] = useState({ MatKhauCu: '', MatKhauMoi: '', XacNhan: '' });
+  const [pwMessage, setPwMessage] = useState('');
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -65,6 +68,7 @@ export default function ProfilePage() {
 
   const tabs = [
     { id: 'profile', label: 'Hồ sơ', icon: 'person' },
+    { id: 'password', label: 'Đổi mật khẩu', icon: 'lock' },
     { id: 'bookings', label: 'Lịch sử đặt phòng', icon: 'hotel' },
     { id: 'invoices', label: 'Hóa đơn', icon: 'receipt_long' },
   ];
@@ -136,6 +140,57 @@ export default function ProfilePage() {
                 className="bg-primary text-white px-8 py-3 rounded-xl font-semibold text-sm hover:bg-amber-900 transition-colors shadow-md disabled:opacity-60 flex items-center gap-2">
                 {saving && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin-slow" />}
                 {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
+              </button>
+            </form>
+          )}
+
+          {/* Change Password Tab */}
+          {activeTab === 'password' && (
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              setPwMessage('');
+              if (pwForm.MatKhauMoi !== pwForm.XacNhan) {
+                setPwMessage('Mật khẩu mới và xác nhận không khớp');
+                return;
+              }
+              if (pwForm.MatKhauMoi.length < 6) {
+                setPwMessage('Mật khẩu mới phải ít nhất 6 ký tự');
+                return;
+              }
+              setSaving(true);
+              try {
+                await authService.changePassword(pwForm.MatKhauCu, pwForm.MatKhauMoi);
+                setPwMessage('Đổi mật khẩu thành công!');
+                setPwForm({ MatKhauCu: '', MatKhauMoi: '', XacNhan: '' });
+              } catch (err) {
+                setPwMessage(err.response?.data?.message || 'Lỗi đổi mật khẩu');
+              }
+              setSaving(false);
+            }} className="max-w-lg space-y-5">
+              {pwMessage && (
+                <div className={`px-4 py-3 rounded-xl text-sm ${pwMessage.includes('thành công') ? 'bg-emerald-50 text-emerald-700' : 'bg-error-container text-error'}`}>
+                  {pwMessage}
+                </div>
+              )}
+              <div>
+                <label className="block text-xs uppercase tracking-[0.15em] text-on-surface-variant font-semibold mb-2">Mật khẩu hiện tại</label>
+                <input type="password" value={pwForm.MatKhauCu} onChange={e => setPwForm(prev => ({ ...prev, MatKhauCu: e.target.value }))}
+                  required className="w-full bg-surface-container-high/60 px-4 py-3 rounded-xl outline-none border border-transparent focus:border-primary text-sm" />
+              </div>
+              <div>
+                <label className="block text-xs uppercase tracking-[0.15em] text-on-surface-variant font-semibold mb-2">Mật khẩu mới</label>
+                <input type="password" value={pwForm.MatKhauMoi} onChange={e => setPwForm(prev => ({ ...prev, MatKhauMoi: e.target.value }))}
+                  required minLength={6} className="w-full bg-surface-container-high/60 px-4 py-3 rounded-xl outline-none border border-transparent focus:border-primary text-sm" />
+              </div>
+              <div>
+                <label className="block text-xs uppercase tracking-[0.15em] text-on-surface-variant font-semibold mb-2">Xác nhận mật khẩu mới</label>
+                <input type="password" value={pwForm.XacNhan} onChange={e => setPwForm(prev => ({ ...prev, XacNhan: e.target.value }))}
+                  required minLength={6} className="w-full bg-surface-container-high/60 px-4 py-3 rounded-xl outline-none border border-transparent focus:border-primary text-sm" />
+              </div>
+              <button type="submit" disabled={saving}
+                className="bg-primary text-white px-8 py-3 rounded-xl font-semibold text-sm hover:bg-amber-900 transition-colors shadow-md disabled:opacity-60 flex items-center gap-2">
+                {saving && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin-slow" />}
+                {saving ? 'Đang xử lý...' : 'Đổi mật khẩu'}
               </button>
             </form>
           )}

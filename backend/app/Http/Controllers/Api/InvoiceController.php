@@ -88,7 +88,7 @@ class InvoiceController extends Controller
         ], 201);
     }
 
-    /** PUT /api/admin/invoices/{id} — Admin: Cập nhật trạng thái thanh toán */
+    /** PUT /api/admin/invoices/{id} — Admin */
     public function update(Request $request, $id)
     {
         $hoaDon = HoaDon::findOrFail($id);
@@ -120,19 +120,19 @@ class InvoiceController extends Controller
 
     // === USER INVOICES ===
 
-    /** GET /api/user/invoices — Logged-in customer */
+    /** GET /api/user/invoices — D5 Fix: proper eager loading */
     public function myInvoices(Request $request)
     {
         $maKH = $request->user()->khachHang->MaKhachHang;
 
         $invoices = HoaDon::whereHas('phieuDatPhong', function ($q) use ($maKH) {
             $q->where('MaKhachHang', $maKH);
-        })->with('phieuDatPhong')->orderBy('NgayLap', 'desc')->get();
+        })->with(['phieuDatPhong.khachHang'])->orderBy('NgayLap', 'desc')->get();
 
         return response()->json($invoices);
     }
 
-    /** GET /api/user/invoices/{id} — Logged-in customer xem chi tiết */
+    /** GET /api/user/invoices/{id} — D5 Fix: full nested eager load */
     public function myInvoiceDetail(Request $request, $id)
     {
         $maKH = $request->user()->khachHang->MaKhachHang;

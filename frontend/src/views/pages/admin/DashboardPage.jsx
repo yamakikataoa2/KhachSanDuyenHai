@@ -5,12 +5,12 @@ import StatCard from '../../components/common/StatCard';
 import StatusBadge from '../../components/common/StatusBadge';
 import { formatVND, formatDate } from '../../../utils/formatters';
 import adminService from '../../../services/adminService';
-import bookingService from '../../../services/bookingService';
 import { SkeletonCard } from '../../components/common/LoadingSkeleton';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
   const [recentBookings, setRecentBookings] = useState([]);
+  const [revenueChart, setRevenueChart] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,13 +18,11 @@ export default function DashboardPage() {
     const fetchDashboard = async () => {
       try {
         setLoading(true);
-        const [statsRes, bookingsRes] = await Promise.all([
-          adminService.getDashboard(),
-          bookingService.getAllBookings({ limit: 5 })
-        ]);
+        const data = await adminService.getDashboard();
         if (isMounted) {
-          setStats(statsRes);
-          setRecentBookings(bookingsRes.slice(0, 5) || []);
+          setStats(data);
+          setRecentBookings(data.recentBookings || []);
+          setRevenueChart(data.revenueChart || []);
         }
       } catch (err) {
         console.error("Dashboard fetch error:", err);
@@ -40,16 +38,15 @@ export default function DashboardPage() {
     return (
       <div className="animate-fade-in space-y-8">
          <PageHeader title="Dashboard" description="Tổng quan hoạt động khách sạn hôm nay" icon="dashboard" />
-         <SkeletonCard />
+         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"><SkeletonCard /><SkeletonCard /><SkeletonCard /><SkeletonCard /></div>
       </div>
     );
   }
 
-  // Placeholder for revenue chart since backend doesn't provide it yet
-  const dummyTuan = [0, 0, 0, 0, 0, 0, 0];
-  const maxRevenue = 100;
-  const tenNgayTuan = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
-  
+  // Revenue chart calculations
+  const maxRevenue = Math.max(...revenueChart.map(r => r.revenue), 1);
+  const totalWeekRevenue = revenueChart.reduce((sum, r) => sum + r.revenue, 0);
+
   const baoTri = Math.max(0, stats.tongPhong - stats.phongTrong - stats.phongDangSD);
 
   return (
@@ -62,40 +59,57 @@ export default function DashboardPage() {
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard icon="bed" label="Tổng phòng" value={stats.tongPhong} subtitle={`${stats.tyLeLapDay}% lấp đầy`} trend="+5%" trendUp color="primary" />
-        <StatCard icon="receipt_long" label="Đơn hôm nay" value={stats.bookingsHomNay} subtitle="Đơn đặt phòng mới" trend="+12%" trendUp color="info" />
-        <StatCard icon="payments" label="Doanh thu tháng" value={formatVND(stats.doanhThuThang || 0)} subtitle="Doanh thu hiện tại" trend="+8.5%" trendUp color="success" />
+        <StatCard icon="bed" label="Tổng phòng" value={stats.tongPhong} subtitle={`${stats.tyLeLapDay}% lấp đầy`} trend={`${stats.phongDangSD} đang dùng`} trendUp color="primary" />
+        <StatCard icon="receipt_long" label="Đơn hôm nay" value={stats.bookingsHomNay} subtitle="Đơn đặt phòng mới" color="info" />
+        <StatCard icon="payments" label="Doanh thu tháng" value={formatVND(stats.doanhThuThang || 0)} subtitle="Doanh thu hiện tại" color="success" />
         <StatCard icon="group" label="Chờ xác nhận" value={stats.bookingsChoDuyet} subtitle="Cần xử lý" color="warning" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Revenue Chart */}
-        <div className="lg:col-span-2 bg-surface-container-lowest p-6 rounded-2xl shadow-[0_2px_12px_rgba(77,70,53,0.06)] relative overflow-hidden">
+        {/* Revenue Chart — Real Data */}
+        <div className="lg:col-span-2 bg-surface-container-lowest p-6 rounded-2xl shadow-[0_2px_12px_rgba(77,70,53,0.06)]">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="font-semibold text-on-surface">Doanh thu 7 ngày qua</h3>
-              <p className="text-xs text-on-surface-variant mt-1">Tính năng biểu đồ API đang phát triển</p>
+              <p className="text-xs text-on-surface-variant mt-1">Tổng: {formatVND(totalWeekRevenue)}</p>
             </div>
-            <span className="text-xs text-emerald-600 font-semibold bg-emerald-50 px-3 py-1 rounded-full">+15.2%</span>
+            {totalWeekRevenue > 0 && (
+              <span className="text-xs text-emerald-600 font-semibold bg-emerald-50 px-3 py-1 rounded-full flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm">trending_up</span>
+                {formatVND(totalWeekRevenue)}
+              </span>
+            )}
           </div>
-          <div className="flex items-end gap-3 h-48 opacity-30">
-            {dummyTuan.map((val, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                <span className="text-xs font-semibold text-on-surface-variant">{val}tr</span>
-                <div 
-                  className="w-full bg-primary-container/60 hover:bg-primary-container rounded-t-lg transition-all duration-300 cursor-pointer min-h-[8px]"
-                  style={{ height: `10%` }}
-                />
-                <span className="text-[10px] text-on-surface-variant font-medium">{tenNgayTuan[i]}</span>
-              </div>
-            ))}
+          <div className="flex items-end gap-3 h-48">
+            {revenueChart.map((item, i) => {
+              const heightPct = maxRevenue > 0 ? Math.max(5, (item.revenue / maxRevenue) * 100) : 5;
+              return (
+                <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
+                  <span className="text-[10px] font-semibold text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">
+                    {item.revenue > 0 ? `${(item.revenue / 1000000).toFixed(1)}tr` : '0'}
+                  </span>
+                  <div 
+                    className="w-full bg-primary-container/60 hover:bg-primary-container rounded-t-lg transition-all duration-500 cursor-pointer min-h-[8px] relative"
+                    style={{ height: `${heightPct}%` }}
+                    title={`${item.date}: ${formatVND(item.revenue)}`}
+                  >
+                    {item.revenue > 0 && (
+                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-on-surface text-surface-container-lowest text-[9px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                        {formatVND(item.revenue)}
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-[10px] text-on-surface-variant font-medium">{item.weekday || item.date}</span>
+                </div>
+              );
+            })}
           </div>
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="bg-surface-container/80 backdrop-blur-sm px-4 py-2 rounded-xl text-sm font-medium text-on-surface">Coming Soon</div>
-          </div>
+          {revenueChart.every(r => r.revenue === 0) && (
+            <p className="text-center text-sm text-on-surface-variant mt-4">Chưa có doanh thu trong 7 ngày qua</p>
+          )}
         </div>
 
-        {/* Quick Stats */}
+        {/* Quick Stats - Room Status */}
         <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_2px_12px_rgba(77,70,53,0.06)]">
           <h3 className="font-semibold text-on-surface mb-6">Tình trạng phòng</h3>
           <div className="space-y-4">
@@ -114,6 +128,12 @@ export default function DashboardPage() {
                 </div>
               </div>
             ))}
+          </div>
+          <div className="mt-6 pt-4 border-t border-surface-container-high">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-on-surface-variant">Tổng khách hàng</span>
+              <span className="font-bold text-primary text-lg">{stats.tongKhach}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -142,8 +162,8 @@ export default function DashboardPage() {
               {recentBookings.map((b, i) => (
                 <tr key={b.MaPhieuDat || i} className={`${i % 2 === 0 ? 'bg-surface-container-lowest' : 'bg-surface-container-low/30'} hover:bg-amber-50/40 transition-colors`}>
                   <td className="px-6 py-4 text-sm font-mono font-semibold text-primary">{b.MaPhieuDat}</td>
-                  <td className="px-6 py-4 text-sm text-on-surface">{b.khach_hang?.HoTen || b.KhachHang}</td>
-                  <td className="px-6 py-4 text-sm text-on-surface-variant">{b.chi_tiet_dat_phongs?.[0]?.phong?.loai_phong?.TenLoai || b.LoaiPhong || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-on-surface">{b.khach_hang?.HoTen || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-on-surface-variant">{b.chi_tiet_dat_phongs?.[0]?.phong?.loai_phong?.TenLoai || 'N/A'}</td>
                   <td className="px-6 py-4 text-sm text-on-surface-variant">{formatDate(b.NgayNhanDuKien)}</td>
                   <td className="px-6 py-4"><StatusBadge status={b.TrangThai} /></td>
                 </tr>

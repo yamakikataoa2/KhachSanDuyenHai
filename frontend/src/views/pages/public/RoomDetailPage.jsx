@@ -35,7 +35,7 @@ export default function RoomDetailPage() {
   }
 
   if (!room) {
-    return <div className="text-center py-24">Không ráp thấy phòng!</div>;
+    return <div className="text-center py-24">Không tìm thấy phòng!</div>;
   }
 
   const tienNghiList = Array.isArray(room.TienNghi) ? room.TienNghi : (room.TienNghi ? (room.TienNghi.startsWith('[') ? JSON.parse(room.TienNghi) : room.TienNghi.split(',').map(s => s.trim())) : []);

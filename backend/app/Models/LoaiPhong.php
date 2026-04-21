@@ -11,8 +11,12 @@ class LoaiPhong extends Model
 
     protected $table = 'loaiphong';
     protected $primaryKey = 'MaLoaiPhong';
-    protected $fillable = ['TenLoai', 'AnhDaiDien', 'MoTa', 'SoNguoiToiDa', 'GiaMacDinh', 'TrangThai'];
+    protected $fillable = ['TenLoai', 'AnhDaiDien', 'MoTa', 'SoNguoiToiDa', 'DienTich', 'TienNghi', 'GiaMacDinh', 'TrangThai'];
 
+    // Cast TienNghi từ JSON string
+    protected $casts = [
+        'TienNghi' => 'array',
+    ];
 
     public function phong() { return $this->hasMany(Phong::class, 'MaLoaiPhong'); }
 }

@@ -74,6 +74,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Service modification on booking
     Route::post('/bookings/{id}/services', [BookingController::class, 'modifyService']);
     Route::get('/bookings/{id}/bill', [BookingController::class, 'calculateBill']);
+
+    // Change password
+    Route::put('/user/change-password', [AuthController::class, 'changePassword']);
 });
 
 // ============================================================

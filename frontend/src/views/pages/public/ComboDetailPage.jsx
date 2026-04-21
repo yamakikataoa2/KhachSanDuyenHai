@@ -81,7 +81,7 @@ export default function ComboDetailPage() {
     navigate('/booking', { state: { selectedCombo: combo, customServices: services, customPricing: pricing } });
   };
 
-  const availableToAdd = allServices.filter(s => !services.find(sv => sv.MaDV === s.MaDichVu));
+  const availableToAdd = allServices.filter(s => !services.find(sv => sv.MaDV === (s.MaDichVu || s.MaDV)));
 
   if (loading) {
     return (
@@ -106,7 +106,7 @@ export default function ComboDetailPage() {
             <span className="material-symbols-outlined text-lg">arrow_back</span> Tất cả ưu đãi
           </Link>
           <div className="flex items-center gap-3 mb-2">
-            <span className="bg-primary-container text-on-primary-container text-xs font-bold px-3 py-1 rounded-full">{combo.SoNgay} ngày {combo.SoNgay - 1} đêm</span>
+            <span className="bg-primary-container text-on-primary-container text-xs font-bold px-3 py-1 rounded-full">{combo.SoNgay || '?'} ngày {(combo.SoNgay || 1) - 1} đêm</span>
             <span className="bg-emerald-500/20 text-emerald-300 text-xs font-bold px-3 py-1 rounded-full">Giảm {combo.PhanTramGiam}%</span>
           </div>
           <h1 className="text-3xl md:text-5xl font-notoSerif text-white">{combo.TenGoi}</h1>
@@ -190,7 +190,7 @@ export default function ComboDetailPage() {
             <div className="pt-3 border-t border-surface-container-high">
               <p className="text-[10px] uppercase tracking-[0.2em] text-on-surface-variant font-bold mb-1">Tổng thanh toán</p>
               <p className="text-3xl font-bold text-primary">{formatVND(pricing.tongThanhToan)}</p>
-              <p className="text-xs text-on-surface-variant mt-1">/ {combo.SoNgay} ngày • cho {combo.SoNguoi} người</p>
+              <p className="text-xs text-on-surface-variant mt-1">/ {combo.SoNgay || '?'} ngày • cho {combo.SoNguoi || '?'} người</p>
             </div>
             <div className="space-y-2.5 pt-2">
               <button onClick={handleBookingNavigate} className="flex items-center justify-center gap-2 w-full bg-primary text-white py-3.5 rounded-xl font-semibold hover:bg-amber-900 transition-all shadow-md text-sm">
@@ -243,7 +243,7 @@ export default function ComboDetailPage() {
             </div>
             <div className="overflow-y-auto max-h-[60vh] p-4 space-y-2">
               {availableToAdd.length > 0 ? availableToAdd.map(svc => (
-                <button key={svc.MaDV} onClick={() => addService(svc)}
+                <button key={svc.MaDichVu || svc.MaDV} onClick={() => addService(svc)}
                   className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-surface-container-low transition-colors text-left">
                   <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
                     <span className="material-symbols-outlined text-primary text-lg">{svc.Icon}</span>

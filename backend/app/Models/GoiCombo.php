@@ -11,11 +11,19 @@ class GoiCombo extends Model
 
     protected $table = 'goicombo';
     protected $primaryKey = 'MaGoi';
-    protected $fillable = ['TenGoi', 'AnhDaiDien', 'GiaGoi', 'PhanTramGiam', 'MoTa', 'TrangThai'];
+    protected $fillable = ['TenGoi', 'AnhDaiDien', 'GiaGoi', 'PhanTramGiam', 'MoTa', 'SoNgay', 'SoNguoi', 'TrangThai'];
 
     public function chiTiet()
     {
         return $this->hasMany(ChiTietGoiCombo::class, 'MaGoi', 'MaGoi');
+    }
+
+    // D2: Many-to-many relationship qua chitietgoicombo
+    public function dichVus()
+    {
+        return $this->belongsToMany(DichVu::class, 'chitietgoicombo', 'MaGoi', 'MaDichVu')
+            ->withPivot('SoLuongMacDinh', 'DonGiaGoc', 'GhiChu')
+            ->withTimestamps();
     }
 
     public function phieuDatPhongs()

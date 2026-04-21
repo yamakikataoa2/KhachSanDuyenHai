@@ -66,7 +66,7 @@ export default function BookingDetailPage() {
       {/* Room hero */}
       <div className="bg-surface-container-lowest rounded-2xl shadow-[0_2px_12px_rgba(77,70,53,0.06)] overflow-hidden">
         <div className="h-56 overflow-hidden relative">
-          <img src={imgRoom || 'https://via.placeholder.com/800x400'} alt={roomName} className="w-full h-full object-cover" />
+          <img src={imgRoom || ''} alt={roomName} className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none'; }} />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
           <div className="absolute bottom-4 left-6 right-6 flex justify-between items-end">
             <div>

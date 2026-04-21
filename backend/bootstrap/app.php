@@ -16,7 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\CheckRole::class,
         ]);
 
-        $middleware->statefulApi();
+        // Không dùng statefulApi() vì frontend dùng Bearer token auth
+        // statefulApi() gây lỗi CSRF 419 cho API requests
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -196,7 +196,7 @@ export default function BookingPage() {
                     {roomTypes.map(room => (
                       <div key={room.MaLoaiPhong} onClick={() => setSelectedRoomType(room.MaLoaiPhong)}
                         className={`flex gap-5 p-4 rounded-2xl cursor-pointer transition-all border-2 ${selectedRoomType === room.MaLoaiPhong ? 'border-primary bg-amber-50/50' : 'border-transparent bg-surface-container-lowest hover:bg-surface-container-low/50 shadow-sm'}`}>
-                        <img src={room.AnhDaiDien || 'https://via.placeholder.com/112x80'} alt={room.TenLoai} className="w-28 h-20 rounded-xl object-cover flex-shrink-0 bg-surface-container-high" />
+                        <img src={room.AnhDaiDien || ''} alt={room.TenLoai} className="w-28 h-20 rounded-xl object-cover flex-shrink-0 bg-surface-container-high" onError={e => { e.target.style.display = 'none'; }} />
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-on-surface font-notoSerif">{room.TenLoai}</h3>
                           <p className="text-xs text-on-surface-variant mt-0.5">{room.SoNguoiToiDa} khách • {room.DienTich}m²</p>

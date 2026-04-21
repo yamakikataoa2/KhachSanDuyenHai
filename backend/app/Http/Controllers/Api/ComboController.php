@@ -71,12 +71,26 @@ class ComboController extends Controller
         ]);
 
         $combo = GoiCombo::create($request->only([
-            'TenGoi', 'AnhDaiDien', 'GiaGoi', 'PhanTramGiam', 'MoTa', 'TrangThai'
+            'TenGoi', 'AnhDaiDien', 'GiaGoi', 'PhanTramGiam', 'MoTa', 'SoNgay', 'SoNguoi', 'TrangThai'
         ]));
+
+        if ($request->has('services')) {
+            foreach ($request->services as $svc) {
+                $dichVu = DichVu::find($svc['MaDV'] ?? $svc['MaDichVu'] ?? null);
+                if (!$dichVu) continue;
+                ChiTietGoiCombo::create([
+                    'MaGoi'          => $combo->MaGoi,
+                    'MaDichVu'       => $dichVu->MaDichVu,
+                    'SoLuongMacDinh' => $svc['SoLuong'] ?? 1,
+                    'DonGiaGoc'      => $svc['DonGia'] ?? $dichVu->DonGia,
+                ]);
+            }
+            $this->recalculateComboPrice($combo);
+        }
 
         return response()->json([
             'message' => 'Tạo gói combo thành công!',
-            'data'    => $combo,
+            'data'    => $combo->load('chiTiet.dichVu'),
         ], 201);
     }
 
@@ -85,12 +99,31 @@ class ComboController extends Controller
     {
         $combo = GoiCombo::findOrFail($id);
         $combo->update($request->only([
-            'TenGoi', 'AnhDaiDien', 'GiaGoi', 'PhanTramGiam', 'MoTa', 'TrangThai'
+            'TenGoi', 'AnhDaiDien', 'GiaGoi', 'PhanTramGiam', 'MoTa', 'SoNgay', 'SoNguoi', 'TrangThai'
         ]));
+
+        // F2: Sync services if provided
+        if ($request->has('services')) {
+            // Delete all existing
+            ChiTietGoiCombo::where('MaGoi', $id)->delete();
+            // Re-create
+            foreach ($request->services as $svc) {
+                $dichVu = DichVu::find($svc['MaDV'] ?? $svc['MaDichVu'] ?? null);
+                if (!$dichVu) continue;
+                ChiTietGoiCombo::create([
+                    'MaGoi'          => $id,
+                    'MaDichVu'       => $dichVu->MaDichVu,
+                    'SoLuongMacDinh' => $svc['SoLuong'] ?? 1,
+                    'DonGiaGoc'      => $svc['DonGia'] ?? $dichVu->DonGia,
+                ]);
+            }
+            // Recalculate
+            $this->recalculateComboPrice($combo);
+        }
 
         return response()->json([
             'message' => 'Cập nhật gói combo thành công!',
-            'data'    => $combo,
+            'data'    => $combo->load('chiTiet.dichVu'),
         ]);
     }
 

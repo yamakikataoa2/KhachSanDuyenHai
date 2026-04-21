@@ -15,6 +15,9 @@ export const authService = {
 
   me: () =>
     apiClient.get('/auth/me'),
+
+  changePassword: (matKhauCu, matKhauMoi) =>
+    apiClient.put('/user/change-password', { MatKhauCu: matKhauCu, MatKhauMoi: matKhauMoi }),
 };
 
 export default authService;
